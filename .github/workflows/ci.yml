@@ -46,6 +46,25 @@ jobs:
           }
           if ($failed) { exit 1 }
 
+      - name: Validate models template and recommended lists consistency
+        shell: pwsh
+        run: |
+          $tpl = [System.IO.File]::ReadAllText((Resolve-Path './models-template.jsonc').Path).TrimStart([char]0xFEFF)
+          $noComments = (($tpl -split "`r?`n") | Where-Object { $_ -notmatch '^\s*//' }) -join "`n"
+          $json = $noComments | ConvertFrom-Json
+          $tplModels = @($json.provider.nvidia.models.PSObject.Properties.Name)
+          if ($tplModels.Count -ne 26) { Write-Host ("template has {0} models, expected 26" -f $tplModels.Count); exit 1 }
+          foreach ($f in @('install.ps1','opencode-update.ps1')) {
+            $txt = [System.IO.File]::ReadAllText((Resolve-Path $f).Path)
+            $m = [regex]::Match($txt, '(?s)\$Script:RecommendedModels\s*=\s*@\((.*?)\)\s*\r?\n')
+            if (-not $m.Success) { Write-Host ("$f does not define `$Script:RecommendedModels"); exit 1 }
+            $ids = [regex]::Matches($m.Groups[1].Value, "'([^']+)'") | ForEach-Object { $_.Groups[1].Value }
+            if ($ids.Count -ne 26) { Write-Host ("{0} has {1} recommended ids, expected 26" -f $f, $ids.Count); exit 1 }
+            $diff = Compare-Object $ids $tplModels
+            if ($diff) { Write-Host ("{0} recommended list differs from models-template.jsonc" -f $f); $diff | Format-Table; exit 1 }
+            Write-Host ("OK: {0} - 26 models consistent with template" -f $f)
+          }
+
       - name: Updater check-mode smoke test (PowerShell 7)
         shell: pwsh
         run: |

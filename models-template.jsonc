@@ -1,0 +1,136 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // opencode-update (canalqb) - template with the 26 free models of the NVIDIA integrate API
+  // How to get your FREE API key: https://build.nvidia.com -> Sign in -> "Get API Key"
+  // The installer replaces PASTE-YOUR-NVIDIA-API-KEY-HERE automatically when you pass
+  // -NvidiaApiKey, set the NVIDIA_API_KEY environment variable, or answers the prompt.
+  // Main model ("big")
+  "model": "nvidia/z-ai/glm-5.3",
+  // Small model for titles/summaries ("small")
+  "small_model": "nvidia/nvidia/llama-3.1-nemotron-nano-8b-v1",
+  "provider": {
+    "nvidia": {
+      "type": "openai",
+      "options": {
+        "baseURL": "https://integrate.api.nvidia.com/v1",
+        "apiKey": "PASTE-YOUR-NVIDIA-API-KEY-HERE"
+      },
+      "models": {
+        "z-ai/glm-5.3": {
+          "name": "GLM-5.3 (Z.ai)",
+          "limit": { "context": 262144, "output": 262144 },
+          "reasoning": true
+        },
+        "z-ai/glm5.1": {
+          "name": "GLM-5.1 (Z.ai)",
+          "limit": { "context": 131072, "output": 131072 },
+          "reasoning": true
+        },
+        "nvidia/llama-3.3-nemotron-super-49b-v1.5": {
+          "name": "Nemotron Super 49B v1.5",
+          "limit": { "context": 262144, "output": 262144 },
+          "reasoning": true
+        },
+        "nvidia/llama-3.1-nemotron-ultra-253b-v1": {
+          "name": "Nemotron Ultra 253B",
+          "limit": { "context": 131072, "output": 131072 },
+          "reasoning": true
+        },
+        "nvidia/nemotron-3-super-120b-a12b": {
+          "name": "Nemotron 3 Super 120B",
+          "limit": { "context": 262144, "output": 262144 }
+        },
+        "meta/llama-3.3-70b-instruct": {
+          "name": "Llama 3.3 70B",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "meta/llama-3.1-405b-instruct": {
+          "name": "Llama 3.1 405B",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "meta/llama-3.1-8b-instruct": {
+          "name": "Llama 3.1 8B (fast)",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "deepseek-ai/deepseek-v4-pro": {
+          "name": "DeepSeek V4 Pro",
+          "limit": { "context": 1048576, "output": 1048576 },
+          "reasoning": true
+        },
+        "deepseek-ai/deepseek-v4-flash": {
+          "name": "DeepSeek V4 Flash (fast)",
+          "limit": { "context": 1048576, "output": 1048576 }
+        },
+        "deepseek-ai/deepseek-r1": {
+          "name": "DeepSeek R1",
+          "limit": { "context": 131072, "output": 131072 },
+          "reasoning": true
+        },
+        "moonshotai/kimi-k2-instruct": {
+          "name": "Kimi K2",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "moonshotai/kimi-k2-thinking": {
+          "name": "Kimi K2 Thinking",
+          "limit": { "context": 262144, "output": 262144 },
+          "reasoning": true
+        },
+        "moonshotai/kimi-k3": {
+          "name": "Kimi K3",
+          "limit": { "context": 1048576, "output": 1048576 },
+          "reasoning": true
+        },
+        "qwen/qwen3-coder-480b-a35b-instruct": {
+          "name": "Qwen3 Coder 480B (best for code)",
+          "limit": { "context": 262144, "output": 262144 }
+        },
+        "qwen/qwen3-next-80b-a3b-instruct": {
+          "name": "Qwen3 Next 80B",
+          "limit": { "context": 262144, "output": 262144 }
+        },
+        "qwen/qwen3-next-80b-a3b-thinking": {
+          "name": "Qwen3 Next 80B Thinking",
+          "limit": { "context": 262144, "output": 262144 },
+          "reasoning": true
+        },
+        "qwen/qwen3-32b": {
+          "name": "Qwen3 32B (fast)",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "qwen/qwq-32b": {
+          "name": "QwQ 32B (reasoning)",
+          "limit": { "context": 131072, "output": 131072 },
+          "reasoning": true
+        },
+        "qwen/qwen2.5-coder-32b-instruct": {
+          "name": "Qwen2.5 Coder 32B",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "mistralai/mistral-large-3-675b-instruct-2512": {
+          "name": "Mistral Large 3 675B",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "mistralai/codestral-22b-instruct-v0.1": {
+          "name": "Codestral 22B (code)",
+          "limit": { "context": 32768, "output": 32768 }
+        },
+        "bytedance/seed-oss-36b-instruct": {
+          "name": "Seed OSS 36B",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "nvidia/llama-3.1-nemotron-nano-8b-v1": {
+          "name": "Nemotron Nano 8B (fast)",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "nvidia/nemotron-3-nano-30b-a3b": {
+          "name": "Nemotron 3 Nano 30B",
+          "limit": { "context": 131072, "output": 131072 }
+        },
+        "nvidia/nemotron-3.5-lightning-30b-a3b": {
+          "name": "Nemotron 3.5 Lightning 30B (fast)",
+          "limit": { "context": 131072, "output": 131072 }
+        }
+      }
+    }
+  }
+}

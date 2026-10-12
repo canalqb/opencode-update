@@ -29,6 +29,43 @@ $Script:ScriptRoot  = if ($PSScriptRoot) { $PSScriptRoot } else { $env:TEMP }
 $Script:BackupRoot  = Join-Path $Script:ScriptRoot 'opencode_backups'
 $Script:LogFile     = Join-Path $Script:ScriptRoot 'opencode_update.log'
 
+# The 26 recommended free models (NVIDIA integrate API) - keep in sync
+# with models-template.jsonc (CI validates the consistency).
+$Script:RecommendedModels = @(
+    'z-ai/glm-5.3',
+    'z-ai/glm5.1',
+    'nvidia/llama-3.3-nemotron-super-49b-v1.5',
+    'nvidia/llama-3.1-nemotron-ultra-253b-v1',
+    'nvidia/nemotron-3-super-120b-a12b',
+    'meta/llama-3.3-70b-instruct',
+    'meta/llama-3.1-405b-instruct',
+    'meta/llama-3.1-8b-instruct',
+    'deepseek-ai/deepseek-v4-pro',
+    'deepseek-ai/deepseek-v4-flash',
+    'deepseek-ai/deepseek-r1',
+    'moonshotai/kimi-k2-instruct',
+    'moonshotai/kimi-k2-thinking',
+    'moonshotai/kimi-k3',
+    'qwen/qwen3-coder-480b-a35b-instruct',
+    'qwen/qwen3-next-80b-a3b-instruct',
+    'qwen/qwen3-next-80b-a3b-thinking',
+    'qwen/qwen3-32b',
+    'qwen/qwq-32b',
+    'qwen/qwen2.5-coder-32b-instruct',
+    'mistralai/mistral-large-3-675b-instruct-2512',
+    'mistralai/codestral-22b-instruct-v0.1',
+    'bytedance/seed-oss-36b-instruct',
+    'nvidia/llama-3.1-nemotron-nano-8b-v1',
+    'nvidia/nemotron-3-nano-30b-a3b',
+    'nvidia/nemotron-3.5-lightning-30b-a3b'
+)
+
+function Get-RecommendedCount {
+    if (-not (Test-Path -LiteralPath $Script:ConfigFile)) { return 0 }
+    $raw = [System.IO.File]::ReadAllText($Script:ConfigFile)
+    return @($Script:RecommendedModels | Where-Object { $raw.Contains('"' + $_ + '"') }).Count
+}
+
 function Write-Log {
     param([string]$Message, [string]$Color = 'Gray')
     $line = ('[{0}] {1}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $Message)
@@ -95,6 +132,7 @@ if ($Check) {
     Write-Log ("scoop available    : {0}" -f $(if ($haveScoop) { 'yes' } else { 'no' }))
     Write-Log ("opencode installed : {0}" -f $(if ($v) { $v } else { 'no / not on PATH' }))
     Write-Log ("models configured  : {0}" -f $(if ($m -ge 0) { $m } else { 'no config file' }))
+    Write-Log ("recommended models : {0}/{1}" -f (Get-RecommendedCount), $Script:RecommendedModels.Count)
     Write-Log ("opencode running   : {0} process(es)" -f $n)
     if (-not $haveScoop) {
         Write-Log 'RESULT: FAILED - scoop not found (run install.ps1 first)' 'Red'
@@ -210,6 +248,12 @@ try {
         if ($configOk) {
             $modelsFinal = Get-ModelCount
             Write-Log ("Models preserved: {0}/{1}. Custom (old) models remain and new catalog models load automatically." -f $modelsFinal, $modelsBefore) 'Green'
+        }
+        $recPresent = Get-RecommendedCount
+        if ($recPresent -lt $Script:RecommendedModels.Count) {
+            Write-Log ("Recommended models coverage: {0}/{1} - run install.ps1 -ApplyModels to complete the set." -f $recPresent, $Script:RecommendedModels.Count) 'Yellow'
+        } else {
+            Write-Log ("Recommended models coverage: {0}/{1}" -f $recPresent, $Script:RecommendedModels.Count) 'Green'
         }
     }
 
