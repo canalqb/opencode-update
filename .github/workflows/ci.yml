@@ -55,3 +55,5 @@ jobs:
           if (-not $out) { Write-Host 'Updater produced no output'; exit 1 }
           if ($out -notmatch 'RESULT: (SUCCESS|FAILED)') { Write-Host 'Updater did not complete gracefully'; exit 1 }
           Write-Host 'Updater smoke test OK (check mode completed).'
+          # explicit exit: pwsh inherits $LASTEXITCODE from the child updater otherwise
+          exit 0
