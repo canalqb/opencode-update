@@ -1,0 +1,4 @@
+opencode_backups/
+*.log
+Thumbs.db
+.DS_Store

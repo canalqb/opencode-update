@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  syntax:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate PowerShell syntax (Windows PowerShell 5.1)
+        shell: powershell
+        run: |
+          $files = @('install.ps1','opencode-update.ps1','uninstall.ps1')
+          $failed = $false
+          foreach ($f in $files) {
+            $tokens = $null; $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f).Path, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              $failed = $true
+              $errors | ForEach-Object { Write-Host ("ERROR in {0} line {1}: {2}" -f $f, $_.Extent.StartLineNumber, $_.Message) }
+            } else {
+              Write-Host ("OK: {0}" -f $f)
+            }
+          }
+          if ($failed) { exit 1 }
+
+      - name: Validate PowerShell syntax (PowerShell 7)
+        shell: pwsh
+        run: |
+          $files = @('install.ps1','opencode-update.ps1','uninstall.ps1')
+          $failed = $false
+          foreach ($f in $files) {
+            $tokens = $null; $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f).Path, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              $failed = $true
+              $errors | ForEach-Object { Write-Host ("ERROR in {0} line {1}: {2}" -f $f, $_.Extent.StartLineNumber, $_.Message) }
+            } else {
+              Write-Host ("OK: {0}" -f $f)
+            }
+          }
+          if ($failed) { exit 1 }
+
+      - name: Updater check-mode smoke test (PowerShell 7)
+        shell: pwsh
+        run: |
+          # -Check must always complete gracefully with a RESULT line, on any machine.
+          $out = & pwsh -NoProfile -File ./opencode-update.ps1 -Check 2>&1 | Out-String
+          Write-Host $out
+          if (-not $out) { Write-Host 'Updater produced no output'; exit 1 }
+          if ($out -notmatch 'RESULT: (SUCCESS|FAILED)') { Write-Host 'Updater did not complete gracefully'; exit 1 }
+          Write-Host 'Updater smoke test OK (check mode completed).'
